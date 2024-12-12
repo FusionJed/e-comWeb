@@ -1,3 +1,8 @@
+<?php
+session_start();
+$_SESSION['isGuest'] = isset($_SESSION['user']) ? true : false;
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -245,6 +250,11 @@
 
 
 
-<script src="script.js"></script>
+<script src="functions/javascript/script.js"></script>
 </body>
-</html>
+</html
+
+<?php
+include "functions/php/connection.php";
+
+?>

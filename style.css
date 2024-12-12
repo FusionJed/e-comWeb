@@ -97,6 +97,25 @@ nav .nav-bar .logo a{
     justify-content: center;
     margin: 0 5px;
 }
+.signup-holder {
+  background: url('images/bg.png');
+  display: flex;
+}
+
+.login{
+  width: 30%;
+  border: 1px solid grey;
+  margin: 5% auto;
+  padding:2%;
+}
+
+.login .text-center {
+  color: white;
+}
+
+.login .alert {
+  color: white;
+}
 
 .searchToggle i{
     position: absolute;
@@ -685,7 +704,7 @@ body {
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    margin-top: 50px;
+    margin-top: auto;
 }
 
 .footer-logo-section {

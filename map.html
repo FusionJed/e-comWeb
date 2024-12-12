@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delivery Range Checker</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+  
+  .section {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.address-check {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;  
+}
+
+
+.address-container {
+  text-align: center;
+  width: 500px; 
+  padding: 20px; 
+  background-color: #f4f4f4; 
+  border-radius: 10px; 
+  box-shadow: 0 4px 10px rgba(0, 0, 0, .5); 
+}    
+    #map {
+      height: 400px;
+      width: 100%;
+      margin-top: 10px;
+
+    }
+    #search-bar {
+      margin-bottom: 10px;
+      width: 50%;
+      padding: 10px;
+      font-size: 16px;
+    }
+    #result {
+      margin-top: 10px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    #save-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #save-button:disabled {
+      background-color: rgb(172, 171, 171);
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  
+<section class="address-check">
+  <div class="address-container">
+    <h1 class="addsect-cont">Delivery Range Checker</h1>
+    <input id="search-bar" type="text" placeholder="Enter your address" />
+    <button onclick="checkDelivery()">Check Delivery</button>
+    <div id="result"></div>
+    <div id="map"></div>
+    <button id="save-button" disabled>save</button>
+  </div>
+</section>
+
+
+  <script>
+
+    const restaurantLocation = [14.112278681230501, 122.95404476912674];
+    const deliveryRadius = 5000; 
+    const map = L.map('map').setView(restaurantLocation, 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    L.marker(restaurantLocation).addTo(map).bindPopup('Our Restaurant').openPopup();
+
+    const circle = L.circle(restaurantLocation, {
+      color: 'green ',
+      fillColor: '#87ffa7',
+      fillOpacity: 0.3,
+      radius: deliveryRadius
+    }).addTo(map);
+
+    function checkDelivery() {
+      const address = document.getElementById('search-bar').value;
+      const saveButton = document.getElementById('save-button');
+      const resultDiv = document.getElementById('result');
+
+      if (!address) {
+        alert('Please enter an address.');
+        return;
+      }
+
+      saveButton.disabled = true;
+      resultDiv.innerText = "Checking address...";
+
+
+      fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.length === 0) {
+            resultDiv.innerText = "Address not found.";
+            return;
+          }
+
+          const userLocation = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+          const userDistance = map.distance(restaurantLocation, userLocation); 
+
+
+          L.marker(userLocation).addTo(map).bindPopup('Your Location').openPopup();
+          map.setView(userLocation, 13);
+
+          if (userDistance <= deliveryRadius) {
+            resultDiv.innerText = "We deliver to your location!";
+            saveButton.disabled = false; 
+          } else {
+            resultDiv.innerText = "Sorry, you're outside our delivery range.";
+            saveButton.disabled = true; 
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          resultDiv.innerText = "An error occurred. Please try again.";
+          saveButton.disabled = true; 
+        });
+    }
+  </script>
+</body>
+</html>
